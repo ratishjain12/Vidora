@@ -11,8 +11,11 @@ const Page = () => {
   });
   const [error, setError] = useState<string | null>(null);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
+    console.log(value);
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
   return (
@@ -27,6 +30,7 @@ const Page = () => {
           label="Title"
           placeholder="Enter clear and concise video title"
           value={formData.title}
+          type="text"
           onChange={handleInputChange}
         />
 
