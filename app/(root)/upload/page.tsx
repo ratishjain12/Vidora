@@ -15,7 +15,7 @@ const Page = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    visibility: "",
+    visibility: "public",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
