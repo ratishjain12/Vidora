@@ -4,10 +4,11 @@ import { auth } from "../auth/auth";
 import { apiFetch, getEnv, withErrorHandling } from "./../utils";
 import { BUNNY } from "@/constants";
 import { db } from "@/db";
-import { videos } from "@/db/schema";
+import { user, videos } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import aj from "../arcjet";
 import { fixedWindow, request } from "@arcjet/next";
+import { and, eq, or, sql } from "drizzle-orm";
 const VIDEO_STREAM_BASE_URL = BUNNY.STREAM_BASE_URL;
 const THUMBNAIL_STORAGE_BASE_URL = BUNNY.STORAGE_BASE_URL;
 const BUNNY_LIBRARY_ID = getEnv("BUNNY_LIBRARY_ID");
@@ -51,6 +52,17 @@ const validateWithArcjet = async (fingerprint: string) => {
   }
 };
 
+const buildVideoWithUserQuery = () => {
+  return db
+    .select({
+      video: videos,
+      user: { id: user.id, name: user.name, email: user.email },
+    })
+    .from(videos)
+    .leftJoin(user, eq(videos.userId, user.id));
+};
+
+//actions
 export const getVideoUploadUrl = withErrorHandling(async () => {
   const videoResponse = await apiFetch<BunnyVideoResponse>(
     `${VIDEO_STREAM_BASE_URL}/${BUNNY_LIBRARY_ID}/videos`,
@@ -114,5 +126,51 @@ export const saveVideoDetails = withErrorHandling(
     revalidatePaths(["/"]);
 
     return { videoId: videoDetails.videoId };
+  }
+);
+
+export const getAllVideos = withErrorHandling(
+  async (
+    searchQuery: string = "",
+    sortFilter?: string,
+    pageNumber: number = 1,
+    pageSize: number = 8
+  ) => {
+    const session = await auth.api.getSession({ headers: await headers() });
+
+    const currentUserId = session?.user?.id;
+
+    const canSeeTheVideos = or(
+      eq(videos.visibility, "public"),
+      eq(videos.userId, currentUserId!)
+    );
+
+    const whereCondition = searchQuery.trim()
+      ? and(canSeeTheVideos, eq(videos.title, searchQuery))
+      : canSeeTheVideos;
+
+    const [{ totalCount }] = await db
+      .select({ totalCount: sql<number>`count(*)` })
+      .from(videos)
+      .where(whereCondition);
+
+    const totalVideos = Number(totalCount || 0);
+    const totalPages = Math.ceil(totalVideos / pageSize);
+
+    const videoRecords = await buildVideoWithUserQuery()
+      .where(whereCondition)
+      .orderBy(sortFilter ? sql`${sortFilter}` : sql`${videos.createdAt} DESC`)
+      .limit(pageSize)
+      .offset((pageNumber - 1) * pageSize);
+
+    return {
+      videos: videoRecords,
+      pagination: {
+        currentPage: pageNumber,
+        totalPages,
+        pageSize,
+        totalVideos,
+      },
+    };
   }
 );
