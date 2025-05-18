@@ -1,5 +1,5 @@
 "use client";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
