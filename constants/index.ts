@@ -51,7 +51,7 @@ export const dummyCards = [
   {
     id: "1",
     title: "SnapChat Message",
-    thumbnail: "/assets/samples/thumbnail (1).png",
+    thumbnailUrl: "/assets/samples/thumbnail (1).png",
     createdAt: new Date("2025-05-01"),
     userImg: "/assets/images/jason.png",
     username: "Jason",
@@ -62,7 +62,7 @@ export const dummyCards = [
   {
     id: "2",
     title: "Product Demo Walkthrough",
-    thumbnail: "/assets/samples/thumbnail (2).png",
+    thumbnailUrl: "/assets/samples/thumbnail (2).png",
     createdAt: new Date("2025-04-15"),
     userImg: "/assets/images/sarah.png",
     username: "Sarah",
@@ -73,7 +73,7 @@ export const dummyCards = [
   {
     id: "3",
     title: "Weekly Team Update",
-    thumbnail: "/assets/samples/thumbnail (3).png",
+    thumbnailUrl: "/assets/samples/thumbnail (3).png",
     createdAt: new Date("2025-04-22"),
     userImg: "/assets/images/michael.png",
     username: "Michael",
@@ -84,7 +84,7 @@ export const dummyCards = [
   {
     id: "4",
     title: "Bug Fix Explanation",
-    thumbnail: "/assets/samples/thumbnail (4).png",
+    thumbnailUrl: "/assets/samples/thumbnail (4).png",
     createdAt: new Date("2025-04-28"),
     userImg: "/assets/images/emily.png",
     username: "Emily",
@@ -95,7 +95,7 @@ export const dummyCards = [
   {
     id: "5",
     title: "New Feature Overview",
-    thumbnail: "/assets/samples/thumbnail (5).png",
+    thumbnailUrl: "/assets/samples/thumbnail (5).png",
     createdAt: new Date("2025-05-05"),
     userImg: "/assets/images/david.png",
     username: "David",
@@ -106,7 +106,7 @@ export const dummyCards = [
   {
     id: "6",
     title: "Client Presentation Feedback",
-    thumbnail: "/assets/samples/thumbnail (6).png",
+    thumbnailUrl: "/assets/samples/thumbnail (6).png",
     createdAt: new Date("2025-05-10"),
     userImg: "/assets/images/lisa.png",
     username: "Lisa",
@@ -117,7 +117,7 @@ export const dummyCards = [
   {
     id: "7",
     title: "UI Design Review",
-    thumbnail: "/assets/samples/thumbnail (7).png",
+    thumbnailUrl: "/assets/samples/thumbnail (7).png",
     createdAt: new Date("2025-05-12"),
     userImg: "/assets/images/alex.png",
     username: "Alex",
@@ -128,7 +128,7 @@ export const dummyCards = [
   {
     id: "8",
     title: "Marketing Strategy Discussion",
-    thumbnail: "/assets/samples/thumbnail (8).png",
+    thumbnailUrl: "/assets/samples/thumbnail (8).png",
     createdAt: new Date("2025-05-18"),
     userImg: "/assets/images/jessica.png",
     username: "Jessica",

@@ -1,12 +1,12 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const VideoCard = ({
   id,
   title,
-  thumbnail,
+  thumbnailUrl,
   createdAt,
   userImg,
   username,
@@ -14,10 +14,26 @@ const VideoCard = ({
   visibility,
   duration,
 }: VideoCardProps) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/video/${id}`);
+    setCopied(true);
+  };
+
+  useEffect(() => {
+    const checkedTimeout = setTimeout(() => {
+      if (copied) {
+        setCopied(false);
+      }
+    }, 2000);
+    return () => clearTimeout(checkedTimeout);
+  }, [copied]);
+
   return (
     <Link href={`/video/${id}`} className="video-card">
       <Image
-        src={thumbnail}
+        src={thumbnailUrl}
         alt="thumbnail"
         width={290}
         height={160}
@@ -52,8 +68,22 @@ const VideoCard = ({
           })}
         </h2>
       </article>
-      <button onClick={() => {}} className="copy-btn">
-        <Image src="/assets/icons/link.svg" alt="link" width={14} height={14} />
+      <button onClick={handleCopyLink} className="copy-btn">
+        {copied ? (
+          <Image
+            src="/assets/images/checked.png"
+            alt="check"
+            width={14}
+            height={14}
+          />
+        ) : (
+          <Image
+            src="/assets/icons/link.svg"
+            alt="link"
+            width={14}
+            height={14}
+          />
+        )}
       </button>
       {duration && (
         <div className="duration">{Math.ceil(duration / 60)} min</div>

@@ -1,7 +1,13 @@
 "use server";
 import { headers } from "next/headers";
 import { auth } from "../auth/auth";
-import { apiFetch, getEnv, withErrorHandling } from "./../utils";
+import {
+  apiFetch,
+  doesTitleMatch,
+  getEnv,
+  getOrderByClause,
+  withErrorHandling,
+} from "./../utils";
 import { BUNNY } from "@/constants";
 import { db } from "@/db";
 import { user, videos } from "@/db/schema";
@@ -56,7 +62,12 @@ const buildVideoWithUserQuery = () => {
   return db
     .select({
       video: videos,
-      user: { id: user.id, name: user.name, email: user.email },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image,
+      },
     })
     .from(videos)
     .leftJoin(user, eq(videos.userId, user.id));
@@ -146,7 +157,7 @@ export const getAllVideos = withErrorHandling(
     );
 
     const whereCondition = searchQuery.trim()
-      ? and(canSeeTheVideos, eq(videos.title, searchQuery))
+      ? and(canSeeTheVideos, doesTitleMatch(videos, searchQuery))
       : canSeeTheVideos;
 
     const [{ totalCount }] = await db
@@ -159,7 +170,7 @@ export const getAllVideos = withErrorHandling(
 
     const videoRecords = await buildVideoWithUserQuery()
       .where(whereCondition)
-      .orderBy(sortFilter ? sql`${sortFilter}` : sql`${videos.createdAt} DESC`)
+      .orderBy(getOrderByClause(sortFilter))
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize);
 
@@ -174,3 +185,10 @@ export const getAllVideos = withErrorHandling(
     };
   }
 );
+
+export const getVideoById = withErrorHandling(async (videoId: string) => {
+  const [videoRecord] = await buildVideoWithUserQuery().where(
+    eq(videos.id, videoId)
+  );
+  return videoRecord;
+});

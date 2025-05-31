@@ -5,10 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const user = {};
-
 const Navbar = () => {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
 
   const handleSignOut = async () => {
     await authClient.signOut();
@@ -30,9 +30,9 @@ const Navbar = () => {
 
         {user && (
           <figure>
-            <button onClick={() => router.push("/profile/123")}>
+            <button onClick={() => router.push(`/profile/${user.id}`)}>
               <Image
-                src="/assets/images/dummy.jpg"
+                src={user.image || ""}
                 alt="User"
                 width={36}
                 height={36}

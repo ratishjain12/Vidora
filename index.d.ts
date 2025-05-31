@@ -72,7 +72,7 @@ declare interface SearchResult {
 declare interface VideoCardProps {
   id: string;
   title: string;
-  thumbnail: string;
+  thumbnailUrl: string;
   userImg: string;
   username: string;
   createdAt: Date;
@@ -82,6 +82,7 @@ declare interface VideoCardProps {
 }
 
 declare interface VideoDetailHeaderProps {
+  id: string;
   title: string;
   createdAt: Date;
   userImg: string | null | undefined;
