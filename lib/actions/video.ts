@@ -14,7 +14,7 @@ import { user, videos } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import aj from "../arcjet";
 import { fixedWindow, request } from "@arcjet/next";
-import { and, eq, or, sql } from "drizzle-orm";
+import { and, eq, ilike, or, sql } from "drizzle-orm";
 const VIDEO_STREAM_BASE_URL = BUNNY.STREAM_BASE_URL;
 const THUMBNAIL_STORAGE_BASE_URL = BUNNY.STORAGE_BASE_URL;
 const BUNNY_LIBRARY_ID = getEnv("BUNNY_LIBRARY_ID");
@@ -192,3 +192,36 @@ export const getVideoById = withErrorHandling(async (videoId: string) => {
   );
   return videoRecord;
 });
+
+export const getAllVideosByUserId = withErrorHandling(
+  async (userId: string, searchQuery: string = "", sortFilter?: string) => {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const currentUserId = session?.user?.id;
+    const isOwner = currentUserId === userId;
+
+    const [userInfo] = await db
+      .select({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image,
+      })
+      .from(user)
+      .where(eq(user.id, userId));
+
+    if (!userInfo) throw new Error("User not found");
+
+    const conditions = [
+      eq(videos.userId, userId),
+      !isOwner && eq(videos.visibility, "public"),
+      searchQuery.trim() && ilike(videos.title, `%${searchQuery}%`),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ].filter(Boolean) as any[];
+
+    const videoRecords = await buildVideoWithUserQuery()
+      .where(and(...conditions))
+      .orderBy(getOrderByClause(sortFilter));
+
+    return { userInfo, videos: videoRecords };
+  }
+);

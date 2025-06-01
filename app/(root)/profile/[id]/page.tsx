@@ -1,22 +1,40 @@
+import EmptyState from "@/components/EmptyState";
 import Header from "@/components/Header";
 import VideoCard from "@/components/Videocard";
-import { dummyCards } from "@/constants";
+import { getAllVideosByUserId } from "@/lib/actions/video";
 import React from "react";
 
-const page = async ({ params }: ParamsWithSearch) => {
+const page = async ({ params, searchParams }: ParamsWithSearch) => {
   const { id } = await params;
-  console.log(id);
+  const { query, filter } = await searchParams;
+
+  const { videos, userInfo } = await getAllVideosByUserId(id, query, filter);
+
+  const {} = getAllVideosByUserId(id);
   return (
     <div className="wrapper page">
       <Header
-        title="Emily"
+        title={userInfo.name}
         subHeader="Profile"
-        userImg="/assets/images/emily.png"
+        userImg={userInfo.image || ""}
       />
       <section className="video-grid">
-        {dummyCards.map((card) => (
-          <VideoCard key={card.id} {...card} />
-        ))}
+        {videos.length > 0 ? (
+          videos.map(({ video, user }) => (
+            <VideoCard
+              key={video.id}
+              {...video}
+              userImg={user?.image || ""}
+              username={user?.name || "Guest"}
+            />
+          ))
+        ) : (
+          <EmptyState
+            icon="/assets/icons/video.svg"
+            title="No videos found"
+            description="No videos found"
+          />
+        )}
       </section>
     </div>
   );
